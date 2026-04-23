@@ -175,3 +175,64 @@ gsap.to(".hero-bg", {
     y: 200,
     ease: "none"
 });
+
+// --- AJAX FORM SUBMISSION ---
+const contactForm = document.querySelector('.contact-form');
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent the page from redirecting
+        
+        const submitBtn = this.querySelector('.submit-btn');
+        const originalBtnText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = 'Sending... <i class="fas fa-spinner fa-spin"></i>';
+        submitBtn.disabled = true;
+
+        const formData = new FormData(this);
+
+        // Send data securely in the background
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success || data.ok || response.ok) {
+                // Show success state inline
+                submitBtn.innerHTML = 'Message Sent! <i class="fas fa-check"></i>';
+                submitBtn.style.backgroundColor = '#28a745'; // Success Green
+                submitBtn.style.borderColor = '#28a745';
+                
+                this.reset(); // Clear the form
+                
+                // Revert button back to normal after 4 seconds
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.style.backgroundColor = '';
+                    submitBtn.style.borderColor = '';
+                    submitBtn.disabled = false;
+                }, 4000);
+            } else {
+                throw new Error('Server returned false');
+            }
+        })
+        .catch(error => {
+            console.error('Submission Error:', error);
+            // Show error state inline
+            submitBtn.innerHTML = 'Error! Try Again <i class="fas fa-exclamation-circle"></i>';
+            submitBtn.style.backgroundColor = '#dc3545'; // Error Red
+            submitBtn.style.borderColor = '#dc3545';
+            
+            setTimeout(() => {
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.style.backgroundColor = '';
+                submitBtn.style.borderColor = '';
+                submitBtn.disabled = false;
+            }, 4000);
+        });
+    });
+}
