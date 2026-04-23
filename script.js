@@ -240,7 +240,6 @@ if (contactForm) {
                 submitBtn.disabled = false;
             }, 4000);
         });
-        });
     });
 }
 
