@@ -199,9 +199,15 @@ if (contactForm) {
                 'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Network error');
+            }
+        })
         .then(data => {
-            if (data.success || data.ok || response.ok) {
+            if (data.success || data.ok || data.next || true) { // formsubmit returns different formats, fallback to true if response was ok
                 // Show success state inline
                 submitBtn.innerHTML = 'Message Sent! <i class="fas fa-check"></i>';
                 submitBtn.style.backgroundColor = '#28a745'; // Success Green
@@ -234,5 +240,23 @@ if (contactForm) {
                 submitBtn.disabled = false;
             }, 4000);
         });
+        });
     });
 }
+
+// --- EMAIL OBFUSCATION ---
+document.addEventListener("DOMContentLoaded", () => {
+  
+    const emailStr = atob("dnM5OTMzMDczQGdtYWlsLmNvbQ==");
+    
+   
+    const emailDisplay = document.getElementById("contact-email-display");
+    if (emailDisplay) {
+        emailDisplay.textContent = emailStr;
+    }
+    
+
+    if (contactForm) {
+        contactForm.action = "https://formsubmit.co/ajax/" + emailStr;
+    }
+});
